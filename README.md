@@ -63,7 +63,7 @@ tree $TEST_HOME
 ```
 Expect something like:
 ```bash
-/tmp/tmp.rKw8Rf4Cup
+/tmp/tmp.csvhZhFv4x
 └── base
     ├── kustomization.yaml
     ├── pi-merger-job.yaml
@@ -83,10 +83,43 @@ You can run kustomize on the base to emit customized resources to stdout and ins
 ```bash
 kustomize build $BASE
 ```
-If you are satisfied:
+Adjust the values of the kustomize output and split the resources into their own files and then execute them in the preferred order.
+
 ```bash
-kubectl apply -k $BASE 
+RESOURCES=$TEST_HOME/resources
+mkdir -p $RESOURCES
+
+kustomize build $BASE -o $RESOURCES
+tree $TEST_HOME
+/tmp/tmp.csvhZhFv4x
+├── base
+│   ├── kustomization.yaml
+│   ├── pi-merger-job.yaml
+│   ├── pi-pvc.yaml
+│   ├── pi-sets.env
+│   ├── pi-worker-service.yaml
+│   ├── pi-worker-statefulset.yaml
+│   └── pi-worker-vpa.yaml
+└── resources
+    ├── apps_v1_statefulset_pi-worker.yaml
+    ├── autoscaling.k8s.io_v1_verticalpodautoscaler_pi-vpa.yaml
+    ├── batch_v1_job_pi-merger.yaml
+    ├── v1_configmap_pi-sets-environment-vars-6mb74fgmb6.yaml
+    ├── v1_persistentvolumeclaim_pi-pvc.yaml
+    └── v1_service_pi-worker-hs.yaml
 ```
+Follow the recipe below (adjust for your own exact filenames) for ConfigMap, pvc, `worker` StatefulSet, `worker` headless Service and `merger` Job:
+```bash
+cd $RESOURCES
+
+kubectl apply -f v1_configmap_pi-sets-environment-vars-6mb74fgmb6.yaml
+kubectl apply -f v1_persistentvolumeclaim_pi-pvc.yaml
+kubectl apply -f apps_v1_statefulset_pi-worker.yaml
+kubectl apply -f v1_service_pi-worker-hs.yaml
+kubectl apply -f autoscaling.k8s.io_v1_verticalpodautoscaler_pi-vpa.yaml
+kubectl apply -f batch_v1_job_pi-merger.yaml
+```
+
 Once the resources are running, follow the job status
 ```bash
 kubectl get jobs -w 
@@ -147,11 +180,12 @@ spec:
         cpu: 500m
         memory: "1000Mi"
 ```
-Inspect the values. If you are satisfied, apply the kustomization after you create the `demo` namespace.
+Delete any previous values in the resources and create the new resource files by applying the kustomization.
 ```bash
-kubectl apply -k $OVERLAYS/demo 
+rm $RESOURCES/*
+kustomize build $OVERLAYS/demo -o $RESOURCES
 ```
-Once the resources are running, repeat the instruction for the base.
+Inspect the values. If you are satisfied, follow the same base recipe for deployment and execution after you create the `demo` namespace.
 
 ## 💭 Feedback and Contributing
 
