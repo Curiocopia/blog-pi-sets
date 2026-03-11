@@ -1,0 +1,57 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pi-merger
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: merger
+          image: YOUR_REGISTRY/chudnovsky-merger
+          env:
+            - name: WORKER_STATEFULSET
+              value: "pi-worker"
+            - name: WORKER_HEADLESS_SVC
+              value: "pi-worker-hs"
+            - name: WORKER_REPLICAS
+              valueFrom:
+                configMapKeyRef:
+                  name: pi-sets-environment-vars
+                  key: WORKER_REPLICAS
+            - name: WORKER_PORT
+              value: "8000"
+            - name: N_TERMS
+              valueFrom:
+                configMapKeyRef:
+                  name: pi-sets-environment-vars
+                  key: N_TERMS
+            - name: PI_DIGITS
+              valueFrom:
+                configMapKeyRef:
+                  name: pi-sets-environment-vars
+                  key: PI_DIGITS
+            - name: OUT_FILE
+              value: "/out/pi.txt"
+            - name: CHUNK_DEC_DIGITS
+              valueFrom:
+                configMapKeyRef:
+                  name: pi-sets-environment-vars
+                  key: CHUNK_DEC_DIGITS
+            - name: SQRT_GUARD_DIGITS
+              valueFrom:
+                configMapKeyRef:
+                  name: pi-sets-environment-vars
+                  key: SQRT_GUARD_DIGITS
+          volumeMounts:
+            - name: out
+              mountPath: /out
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1000Mi"
+      volumes:
+        - name: out
+          persistentVolumeClaim:
+            claimName: pi-pvc

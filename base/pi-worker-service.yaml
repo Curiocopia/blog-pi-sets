@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: pi-worker-hs
+  labels:
+    app: pi-worker
+spec:
+  clusterIP: None
+  selector:
+    app: pi-worker
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000

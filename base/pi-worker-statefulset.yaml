@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: pi-worker
+spec:
+  serviceName: pi-worker-hs
+  replicas: 4
+  selector:
+    matchLabels:
+      app: pi-worker
+  template:
+    metadata:
+      labels:
+        app: pi-worker
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: worker
+          image: YOUR_REGISTRY/chudnovsky-worker
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8000
+          env:
+            - name: WORKER_REPLICAS
+              valueFrom:
+                configMapKeyRef:
+                  name: pi-sets-environment-vars
+                  key: WORKER_REPLICAS
+            - name: PORT
+              value: "8000"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "100m"
+              memory: "256Mi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 2
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            failureThreshold: 3

@@ -1,0 +1,22 @@
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: pi-vpa
+spec:
+  targetRef:
+    apiVersion: "apps/v1"
+    kind: StatefulSet
+    name: pi-worker
+  updatePolicy:
+    updateMode: "InPlaceOrRecreate"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: 'worker'
+      minAllowed:
+        cpu: 330m
+        memory: "300Mi"
+      maxAllowed:
+        cpu: 330m
+        memory: "1000Mi"
+      controlledResources: ["cpu","memory"]
+      controlledValues: "RequestsAndLimits"
