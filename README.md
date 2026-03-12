@@ -165,7 +165,7 @@ images:
 ```
 Adjust `pi-sets-demo.env` values for ConfigMap creation to use in various reources.
 
-Adjust the values for the `spec.replicas` in the `pi-worker-statefulset-patch.yaml` to be identical to $WORKER_REPLICAS$ set in `pi-sets-demo.env`.
+Adjust the values for the `spec.replicas` in the `pi-worker-statefulset-patch.yaml` to be identical to `WORKER_REPLICAS` set in `pi-sets-demo.env`.
 
 Adjust the values for the `spec.resourcePolicy` in the `pi-worker-vpa-patch.yaml`:
 ```yaml
