@@ -156,10 +156,10 @@ Adjust the parameters as you need. Set `namespace` for all resources and `chudno
 namespace: demo
 
 images:
-- name: merger
+- name: YOUR_REGISTRY/chudnovsky-merger
   newName: my-registry/chudnovsky-merger
   newTag: latest
-- name: worker
+- name: YOUR_REGISTRY/chudnovsky-worker
   newName: my-registry/chudnovsky-worker
   newTag: latest
 ```

@@ -4,10 +4,10 @@ kind: Kustomization
 namespace: demo
 
 images:
-- name: merger
+- name: YOUR_REGISTRY/chudnovsky-merger
   newName: my-registry/chudnovsky-merger
   newTag: latest
-- name: worker
+- name: YOUR_REGISTRY/chudnovsky-worker
   newName: my-registry/chudnovsky-worker
   newTag: latest
 
